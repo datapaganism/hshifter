@@ -14,14 +14,18 @@ bool sequential_mode = false;
 void setup() {
   pinMode(4, OUTPUT);
   pinMode(A1, OUTPUT);  
-  pinMode(LED_BUILTIN_TX, OUTPUT);
-  pinMode(LED_BUILTIN_RX, OUTPUT);
+  pinMode(LED_BUILTIN, OUTPUT);
+  // pinMode(LED_BUILTIN_TX, OUTPUT);
+  // pinMode(LED_BUILTIN_RX, OUTPUT);
+  TXLED0;
+  RXLED0; 
 
-
+  pinMode(5, INPUT_PULLUP);
   pinMode(6, INPUT_PULLUP);
   pinMode(7, INPUT_PULLUP);
   pinMode(8, INPUT_PULLUP);
   pinMode(9, INPUT_PULLUP);
+  pinMode(10, INPUT_PULLUP);
   pinMode(A0, INPUT_PULLUP);
   pinMode(16, INPUT_PULLUP);
   pinMode(14, INPUT_PULLUP);
@@ -29,6 +33,10 @@ void setup() {
 
   digitalWrite(4,0);
   digitalWrite(A1,0);
+
+  digitalWrite(LED_BUILTIN, !sequential_mode);
+  // digitalWrite(LED_BUILTIN_RX, !sequential_mode);
+  // digitalWrite(LED_BUILTIN_TX, !sequential_mode);
 
   Joystick.begin(false);
 
@@ -49,31 +57,32 @@ void reset_all(int size)
 void loop() {
 
   static bool last_g3 = 0;
-  static bool last_g4 = 0;
+  static bool last_g8 = 0;
 
-  bool g1 = !(bool)digitalRead(6);
-  bool g2 = !(bool)digitalRead(A0);
-  bool g3 = !(bool)digitalRead(7);
-  bool g4 = !(bool)digitalRead(15);
-  bool g5 = !(bool)digitalRead(8);
-  bool g6 = !(bool)digitalRead(16);
-  bool g7 = !(bool)digitalRead(9);
-  bool gR = !(bool)digitalRead(14);
+  bool g1 = !(bool)digitalRead(15);
+  bool g2 = !(bool)digitalRead(5);
+  bool g3 = !(bool)digitalRead(14);
+  bool g4 = !(bool)digitalRead(6);
+  bool g5 = !(bool)digitalRead(16);
+  bool g6 = !(bool)digitalRead(8);
+  bool g7 = !(bool)digitalRead(10);
+  bool g8 = !(bool)digitalRead(7);
 
-  if (g3 != last_g3 && g4 != last_g4)
+  if (g3 != last_g3 && g8 != last_g8)
   {
 
-    if (g3 && g4)
+    if (g3 && g8)
     {
       sequential_mode = !sequential_mode;
-      digitalWrite(LED_BUILTIN_RX, sequential_mode);
-      digitalWrite(LED_BUILTIN_TX, sequential_mode);
+      digitalWrite(LED_BUILTIN, !sequential_mode);
+      // digitalWrite(LED_BUILTIN_RX, !sequential_mode);
+      // digitalWrite(LED_BUILTIN_TX, !sequential_mode);
 
       reset_all(9);
     }
 
     last_g3 = g3;
-    last_g4 = g4;
+    last_g8 = g8;
   }
   else if (sequential_mode)
   {
@@ -91,7 +100,7 @@ void loop() {
     Joystick.setButton(4,g5);
     Joystick.setButton(5,g6);
     Joystick.setButton(6,g7);
-    Joystick.setButton(7,gR);
+    Joystick.setButton(7,g8);
     Joystick.setButton(8, 0);
     Joystick.setButton(9, 0);
   }
@@ -116,5 +125,5 @@ void loop() {
 #endif
 
   Joystick.sendState();
-  delay(1);
+  delay(10);
 }
