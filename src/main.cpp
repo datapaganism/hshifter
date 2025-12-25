@@ -13,8 +13,10 @@
 #define GRND_1 4
 #define GRND_2 A1
 
+#define BUTTON_COUNT 10
+
 Joystick_ Joystick(JOYSTICK_DEFAULT_REPORT_ID, JOYSTICK_TYPE_GAMEPAD,
-                   10, 0,                // Button Count, Hat Switch Count
+                   BUTTON_COUNT, 0,                // Button Count, Hat Switch Count
                    false, false, false,  // X and Y, but no Z Axis
                    false, false, false,  // No Rx, Ry, or Rz
                    false, false,         // No rudder or throttle
@@ -47,14 +49,21 @@ unsigned long last_refresh = 0;
 unsigned int debounce = 50;
 
 
+void write_leds(bool state)
+{
+  digitalWrite(LED_BUILTIN, state);
+  digitalWrite(LED_BUILTIN_TX, state);
+  digitalWrite(LED_BUILTIN_RX, state);
+}
+
 void setup()
 {
   pinMode(GRND_1, OUTPUT);
   pinMode(GRND_2, OUTPUT);
-  pinMode(LED_BUILTIN, OUTPUT);
 
-  TXLED0;
-  RXLED0;
+  pinMode(LED_BUILTIN_TX,OUTPUT);
+  pinMode(LED_BUILTIN_RX,OUTPUT);
+  pinMode(LED_BUILTIN, OUTPUT);
 
   for (int i = 0; i < gears_count; i++)
   {
@@ -64,8 +73,7 @@ void setup()
   digitalWrite(GRND_1, LOW);
   digitalWrite(GRND_2, LOW);
 
-  digitalWrite(LED_BUILTIN, !sequential_mode);
-
+  write_leds(!sequential_mode);
   Joystick.begin(false);
 
 #if DEBUG == 1
@@ -139,9 +147,9 @@ void loop()
         Serial.print(sequential_mode);
         Serial.println();
 #endif
-        digitalWrite(LED_BUILTIN, !sequential_mode);
+        write_leds(!sequential_mode);
 
-        reset_all(9);
+        reset_all(BUTTON_COUNT - 1);
       }
 
     last_gear_x = gear_x->current;
